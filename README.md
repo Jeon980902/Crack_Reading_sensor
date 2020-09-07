@@ -1,4 +1,4 @@
-# Crack_Reading_sensor
+# Particle 기기와 스프레드 시트 연동하기
 * 구글 스프레드 시트를 새로 생성해주세요.
 
 * *1행 => 1열* 의 이름을 `Timestamp`, *2열* 의 이름을 `Crack`으로 설정해주세요.
@@ -55,9 +55,9 @@ function setup() {
     SCRIPT_PROP.setProperty("key", doc.getId());
 }
 ```
-* *코드.gs*의 var SHEET_NAME = "`Sheet1`" 에서 Sheet1을 *구글 스프레드시트의* `시트 이름`과 똑같이 변경해주세요.
+* `코드.gs`의 var SHEET_NAME = "`Sheet1`" 에서 Sheet1을 *구글 스프레드시트의* `시트 이름`과 똑같이 변경해주세요.
 
-* *코드.gs*를 `저장`한 뒤, `실행>함수실행>setup`을 눌러주세요.
+* `코드.gs`를 `저장`한 뒤, `실행>함수실행>setup`을 눌러주세요.
 * 팝업되는 창에서 권한을 허용해주세요.
 * 스크립트 페이지로 돌아와 `파일>버전관리`를 클릭해주세요.
 * `Describe what has changed`란에 `Initial version` 을 입력하고 `Save New Version`을 클릭한후, `확인` 버튼을 눌러주세요.
