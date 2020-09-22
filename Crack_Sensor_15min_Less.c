@@ -2,6 +2,14 @@
 //본  코드는 주기적으로 가변저항값을 받아 웹사이트 https://console.particle.io 에 업로드 하는 코드입니다.
 
 #include "Particle.h"
+#include <HX711ADC.h>
+
+//HX711
+#define DOUT A1
+#define CLK A0
+
+HX711ADC scale;
+float calibration_factor = 2000; //-7050 worked for my 440lb max scale setup
 
 SYSTEM_THREAD(ENABLED);
 SYSTEM_MODE(SEMI_AUTOMATIC);
@@ -36,6 +44,7 @@ long lastFirmwareUpdateCheck = 0;
 long lastDiagnosticsPublish = 0;
 char publishData[256];
 particle::Future<bool> publishFuture;
+void firmwareUpdateHandler(system_event_t event, int param);
 
 
 
@@ -44,6 +53,12 @@ void setup() {
     Cellular.on();
     Particle.connect();
     stateTime = millis();
+    
+    scale.begin(DOUT, CLK);
+    scale.set_scale();
+    scale.tare(); //Reset the scale to 0
+    
+    long zero_factor = scale.read_average(); //Get a baseline reading
 }
 
 void loop() {
@@ -64,7 +79,7 @@ void loop() {
         
         case STATE_READ_SENSOR:                                                                             //가변저항값 확인
             {
-                int crack = analogRead(A0);
+                int crack = scale.get_units();
                 snprintf(publishData, sizeof(publishData), "{\"Crack_value\" : %d}", crack);                   //변수에 가변저항값 저장 및 다음 단계로 진행
             }
             state = STATE_PUBLISH;
@@ -73,7 +88,7 @@ void loop() {
 
         case STATE_PUBLISH:                                                                                 //변수 송신 시도
             if (Particle.connected()) {
-                publishFuture = Particle.publish("sensorValue", publishData, PRIVATE | WITH_ACK);              //변수 송신 시도 후 다음 단계로 진행
+                publishFuture = Particle.publish("googleDocs", publishData, 60, PRIVATE | WITH_ACK);            //변수 송신 시도 후 다음 단계로 진행
                 state = STATE_PUBLISH_WAIT;
                 stateTime = millis();
 
